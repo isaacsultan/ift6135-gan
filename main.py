@@ -18,9 +18,6 @@ def build_model():
         generator = generator.cuda()
         discriminator = discriminator.cuda()
 
-    #generator.weight_init(mean=0.0, std=0.02)
-    #discriminator.weight_init(mean=0.0, std=0.02)
-
     loss = nn.BCELoss()
     optimizer_g = torch.optim.Adam(generator.parameters(), lr=2e-4)
     optimizer_d = torch.optim.Adam(discriminator.parameters(), lr=2e-4)
@@ -31,6 +28,11 @@ def train(trainloader, generator, discriminator, loss, optimizer_g, optimizer_d)
     ctr = 0
     minibatch_disc_losses = []
     minibatch_gen_losses = []
+
+    fixed_noise = Variable(torch.FloatTensor(8 * 8, 128, 1, 1).normal_(0, 1), volatile=True)
+
+    if cuda_available:
+        fixed_noise.cuda()
 
     for epoch in range(50):
         for batch_idx, (inputs, targets) in enumerate(trainloader):
@@ -102,29 +104,11 @@ def train(trainloader, generator, discriminator, loss, optimizer_g, optimizer_d)
         print('Generator loss : %.3f' % (np.mean(minibatch_gen_losses)))
         print('Discriminator loss : %.3f' % (np.mean(minibatch_disc_losses)))
 
+        utility.plot_result(generator, fixed_noise, 64, epoch, 'logs')
+
     utility.save_losses(minibatch_disc_losses, minibatch_gen_losses)
     utility.save(discriminator, generator)
 
-def eval(generator):
-    # Set generator in evaluation mode to use running means and averages for Batchnorm
-    generator.eval()
-
-    # Sample z ~ N(0, 1)
-    minibatch_noise = Variable(torch.from_numpy(
-        np.random.randn(16, z_dim, 1, 1).astype(np.float32)
-    ))
-
-    if cuda_available:
-        minibatch_noise = minibatch_noise.cuda()
-
-    fakes = generator(minibatch_noise)
-
-    fig = plt.figure(figsize=(10, 10))
-    idx = 1
-    for ind, fake in enumerate(fakes):
-        fig.add_subplot(4, 4, ind + 1)
-        plt.imshow(fake.data.cpu().numpy().reshape(28, 28), cmap='gray')
-        plt.axis('off')
 
 def main():
 
@@ -132,8 +116,10 @@ def main():
     generator, discriminator, loss, optimizer_g, optimizer_d = build_model()
     trainloader = utility.trainloader()
     train(trainloader, generator, discriminator, loss, optimizer_g, optimizer_d)
-    eval(generator)
-    print(inception_score.calculate(utility.trainloader_helper(), cuda=cuda_available, batch_size=32, resize=True, splits=10))
+
+    inc_score = inception_score.calculate(utility.trainloader_helper(), cuda=cuda_available, batch_size=32, resize=True, splits=10)
+    print('Inception score: {}'.format(inc_score))
+
 
 
 if __name__ == '__main__':
