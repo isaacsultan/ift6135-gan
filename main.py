@@ -18,6 +18,9 @@ def build_model():
         generator = generator.cuda()
         discriminator = discriminator.cuda()
 
+    #generator.weight_init(mean=0.0, std=0.02)
+    #discriminator.weight_init(mean=0.0, std=0.02)
+
     loss = nn.BCELoss()
     optimizer_g = torch.optim.Adam(generator.parameters(), lr=2e-4)
     optimizer_d = torch.optim.Adam(discriminator.parameters(), lr=2e-4)
@@ -46,9 +49,9 @@ def train(trainloader, generator, discriminator, loss, optimizer_g, optimizer_d)
             # Update Discriminator
 
             # Sample z ~ N(0, 1)
-            minibatch_noise = Variable(torch.from_numpy(
-                np.random.randn(inputs.size(0), z_dim, 1, 1).astype(np.float32)
-            ))
+            minibatch_noise = Variable(
+                torch.randn((128, 100)).view(-1, 100, 1, 1)
+            )
 
             if cuda_available:
                 minibatch_noise = minibatch_noise.cuda()
@@ -79,9 +82,9 @@ def train(trainloader, generator, discriminator, loss, optimizer_g, optimizer_d)
             optimizer_g.zero_grad()
 
             # Sample z ~ N(0, 1)
-            minibatch_noise = Variable(torch.from_numpy(
-                np.random.randn(inputs.size(0), z_dim, 1, 1).astype(np.float32)
-            ))
+            minibatch_noise = Variable(
+                torch.randn((128, 100)).view(-1, 100, 1, 1)
+            )
 
             if cuda_available:
                 minibatch_noise = minibatch_noise.cuda()
