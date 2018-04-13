@@ -3,6 +3,8 @@ import torch
 from torch.autograd import Variable
 import numpy as np
 import torch.nn as nn
+import matplotlib as mpl
+mpl.use('Agg')
 import matplotlib.pyplot as plt
 import utility
 import inception_score
