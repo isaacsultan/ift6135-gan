@@ -1,13 +1,14 @@
-from model import Generator, Discriminator
-import torch
-from torch.autograd import Variable
-import numpy as np
-import torch.nn as nn
 import matplotlib as mpl
-mpl.use('Agg')
-import matplotlib.pyplot as plt
-import utility
+import numpy as np
+import torch
+import torch.nn as nn
+from torch.autograd import Variable
+
 import inception_score
+import utility
+from model import Generator, Discriminator
+
+mpl.use('Agg')
 
 z_dim = 128
 cuda_available = torch.cuda.is_available()
@@ -25,6 +26,7 @@ def build_model(model_type):
     optimizer_d = torch.optim.Adam(discriminator.parameters(), lr=2e-4)
 
     return generator, discriminator, loss, optimizer_g, optimizer_d
+
 
 def train(trainloader, generator, discriminator, loss, optimizer_g, optimizer_d):
     ctr = 0
@@ -69,7 +71,7 @@ def train(trainloader, generator, discriminator, loss, optimizer_g, optimizer_d)
             if discriminator.model_name == 'DCGAN':
                 d_real_loss = loss(d_real, ones)  # Train discriminator to recognize real examples
             else:
-                d_real_loss = 0.5 * torch.mean((d_real-ones)**2)
+                d_real_loss = 0.5 * torch.mean((d_real - ones) ** 2)
             d_real_loss.backward()
 
             # Train with fake examples from the generator
@@ -100,7 +102,7 @@ def train(trainloader, generator, discriminator, loss, optimizer_g, optimizer_d)
             if generator.model_name == 'DCGAN':
                 g_loss = loss(d_fake, ones)  # Train generator to fool the discriminator into thinking these are real.
             else:
-                g_loss = 0.5 * torch.mean((d_fake-ones)**2)
+                g_loss = 0.5 * torch.mean((d_fake - ones) ** 2)
             g_loss.backward()
 
             # Update the generator
@@ -118,7 +120,6 @@ def train(trainloader, generator, discriminator, loss, optimizer_g, optimizer_d)
 
 
 def main():
-
     for model_type in ['DCGAN', 'LSGAN']:
         generator, discriminator, loss, optimizer_g, optimizer_d = build_model(model_type)
         trainloader = utility.trainloader()
