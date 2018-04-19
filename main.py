@@ -1,21 +1,20 @@
-import matplotlib as mpl
-import numpy as np
-import torch
-import torch.nn as nn
-from torch.autograd import Variable
-
-import inception_score
-import utility
 from model import Generator, Discriminator
-
+import torch
+from torch.autograd import Variable
+import numpy as np
+import torch.nn as nn
+import matplotlib as mpl
 mpl.use('Agg')
+import matplotlib.pyplot as plt
+import utility
+import inception_score
 
 z_dim = 128
 cuda_available = torch.cuda.is_available()
 
 
-def build_model():
-    generator = Generator()
+def build_model(model_type):
+    generator = Generator(model_name=model_type)
     discriminator = Discriminator()
     if cuda_available:
         generator = generator.cuda()
@@ -26,7 +25,6 @@ def build_model():
     optimizer_d = torch.optim.Adam(discriminator.parameters(), lr=2e-4)
 
     return generator, discriminator, loss, optimizer_g, optimizer_d
-
 
 def train(trainloader, generator, discriminator, loss, optimizer_g, optimizer_d):
     ctr = 0
@@ -52,7 +50,7 @@ def train(trainloader, generator, discriminator, loss, optimizer_g, optimizer_d)
             if cuda_available:
                 zeros, ones = zeros.cuda(), ones.cuda()
 
-            # Update Discriminator
+            # UPDATE DISCRIMINATOR
 
             # Sample z ~ N(0, 1)
             minibatch_noise = Variable(
@@ -68,7 +66,10 @@ def train(trainloader, generator, discriminator, loss, optimizer_g, optimizer_d)
             # Train with real examples
             d_real = discriminator(inputs)
 
-            d_real_loss = loss(d_real, ones)  # Train discriminator to recognize real examples
+            if discriminator.model_name == 'DCGAN':
+                d_real_loss = loss(d_real, ones)  # Train discriminator to recognize real examples
+            else:
+                d_real_loss = 0.5 * torch.mean((d_real-ones)**2)
             d_real_loss.backward()
 
             # Train with fake examples from the generator
@@ -79,10 +80,10 @@ def train(trainloader, generator, discriminator, loss, optimizer_g, optimizer_d)
             d_fake_loss.backward()
             minibatch_disc_losses.append(d_real_loss.data[0] + d_fake_loss.data[0])
 
-            # Update the discriminator
+            # # the discriminator
             optimizer_d.step()
 
-            # Update Generator
+            ### UPDATE GENERATOR
 
             # Zero gradients for the generator
             optimizer_g.zero_grad()
@@ -96,8 +97,10 @@ def train(trainloader, generator, discriminator, loss, optimizer_g, optimizer_d)
                 minibatch_noise = minibatch_noise.cuda()
 
             d_fake = discriminator(generator(minibatch_noise))
-            g_loss = loss(d_fake, ones)  # Train generator to fool the discriminator into thinking these are real.
-
+            if generator.model_name == 'DCGAN':
+                g_loss = loss(d_fake, ones)  # Train generator to fool the discriminator into thinking these are real.
+            else:
+                g_loss = 0.5 * torch.mean((d_fake-ones)**2)
             g_loss.backward()
 
             # Update the generator
@@ -110,18 +113,19 @@ def train(trainloader, generator, discriminator, loss, optimizer_g, optimizer_d)
 
         utility.plot_result(generator, fixed_noise, 64, epoch, 'logs')
 
-    utility.save_losses(minibatch_disc_losses, minibatch_gen_losses)
+    utility.save_losses(minibatch_disc_losses, minibatch_gen_losses, generator.model_name)
     utility.save(discriminator, generator)
 
 
 def main():
-    # First (modified) DCGAN, then LSGAN
-    generator, discriminator, loss, optimizer_g, optimizer_d = build_model()
-    trainloader = utility.trainloader()
-    train(trainloader, generator, discriminator, loss, optimizer_g, optimizer_d)
 
-    inc_score = inception_score.calculate(utility.trainloader_helper(), cuda=cuda_available, batch_size=32, resize=True, splits=10)
-    print('Inception score: {}'.format(inc_score))
+    for model_type in ['DCGAN', 'LSGAN']:
+        generator, discriminator, loss, optimizer_g, optimizer_d = build_model(model_type)
+        trainloader = utility.trainloader()
+        train(trainloader, generator, discriminator, loss, optimizer_g, optimizer_d)
+
+        inc_score = inception_score.calculate(utility.trainloader_helper(), cuda=cuda_available, batch_size=32, resize=True, splits=10)
+        print('Inception score: {}'.format(inc_score))
 
 
 if __name__ == '__main__':
