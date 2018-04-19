@@ -7,11 +7,10 @@ cuda_available = torch.cuda.is_available()
 
 class Generator(nn.Module):
 
-    def __init__(self, z_dim=128, model_name ='DCGAN'):
+    def __init__(self, z_dim=128, model_name='DCGAN'):
         super(Generator, self).__init__()
         self.z_dim = z_dim
         self.model_name = model_name
-
 
         self.deconv1 = nn.ConvTranspose2d(
             in_channels=100, out_channels=z_dim * 8,
@@ -60,7 +59,7 @@ class Generator(nn.Module):
 
 class Discriminator(nn.Module):
 
-    def __init__(self, z_dim=128, model_name = 'DCGAN'):
+    def __init__(self, z_dim=128, model_name='DCGAN'):
         super(Discriminator, self).__init__()
         self.z_dim = z_dim
         self.model_name = model_name

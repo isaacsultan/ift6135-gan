@@ -1,14 +1,9 @@
-import torch
 import torch.nn as nn
-import torch.nn.functional as F
-
-from torch.autograd import Variable
 
 
 class Generator(nn.Module):
     def __init__(self, nz, ngf, nChannels):
         super(Generator, self).__init__()
-
 
         self.layer1 = nn.Sequential(
             # input : z
