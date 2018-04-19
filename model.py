@@ -2,15 +2,15 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
-
 cuda_available = torch.cuda.is_available()
 
 class Generator(nn.Module):
 
-    def __init__(self, z_dim=128):
+    def __init__(self, z_dim=128, model_name ='DCGAN'):
         super(Generator, self).__init__()
         self.z_dim = z_dim
-        self.model_name = 'DCGAN'
+        self.model_name = model_name
+
 
         self.deconv1 = nn.ConvTranspose2d(
             in_channels=100, out_channels=z_dim*8,
@@ -59,10 +59,10 @@ class Generator(nn.Module):
 
 class Discriminator(nn.Module):
 
-    def __init__(self, z_dim=128):
+    def __init__(self, z_dim=128, model_name = 'DCGAN'):
         super(Discriminator, self).__init__()
         self.z_dim = z_dim
-        self.model_name = 'DCGAN'
+        self.model_name = model_name
 
 
         self.conv1 = nn.Conv2d(
@@ -107,4 +107,8 @@ class Discriminator(nn.Module):
         x = F.leaky_relu(self.bn2(self.conv2(x)), 0.2)
         x = F.leaky_relu(self.bn3(self.conv3(x)), 0.2)
         x = F.leaky_relu(self.bn4(self.conv4(x)), 0.2)
-        return F.sigmoid(self.conv5(x)).squeeze()
+
+        if self.model_name == 'LSGAN':
+            return self.conv5(x).squeeze()
+        else:
+            return F.sigmoid(self.conv5(x)).squeeze()

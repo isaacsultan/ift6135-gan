@@ -60,17 +60,20 @@ def save(discriminator, generator):
     torch.save(discriminator.state_dict(), os.path.join('logs', discriminator.model_name + '_D.pkl'))
 
 
-def save_losses(minibatch_disc_losses, minibatch_gen_losses):
+def save_losses(minibatch_disc_losses, minibatch_gen_losses, model_name):
     if not os.path.exists('logs'):
         os.makedirs('logs')
 
-    with open(os.path.join('logs', minibatch_disc_losses + '.pk')) as f:
+    fname1 = model_name + '_minibatch_disc_losses.pk'
+    fname2 = model_name + '_minibatch_gen_losses.pk'
+
+    with open(os.path.join('logs', fname1)) as f:
         pk.dump(minibatch_disc_losses, f)
-    with open(os.path.join('logs', minibatch_gen_losses + '.pk')) as f:
+    with open(os.path.join('logs', fname2)) as f:
         pk.dump(minibatch_gen_losses, f)
 
 
-def plot_result(G, fixed_noise, image_size, num_epoch, save_dir, fig_size=(8, 8)):
+def plot_result(G, fixed_noise, num_epoch, save_dir, fig_size=(8, 8)):
     G.eval()
     generate_images = G(fixed_noise)
     G.train()
@@ -88,5 +91,6 @@ def plot_result(G, fixed_noise, image_size, num_epoch, save_dir, fig_size=(8, 8)
     title = 'Epoch {0}'.format(num_epoch)
     fig.text(0.5, 0.04, title, ha='center')
 
-    plt.savefig(os.path.join(save_dir, 'DCGAN_epoch_{}.png'.format(num_epoch)))
+    filename = G.model_name + '_epoch_' + num_epoch + 'png'
+    plt.savefig(os.path.join(save_dir, filename))
     plt.close()
