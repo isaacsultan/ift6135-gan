@@ -1,13 +1,14 @@
-from model import Generator, Discriminator
-import torch
-from torch.autograd import Variable
-import numpy as np
-import torch.nn as nn
 import matplotlib as mpl
-mpl.use('Agg')
-import matplotlib.pyplot as plt
-import utility
+import numpy as np
+import torch
+import torch.nn as nn
+from torch.autograd import Variable
+
 import inception_score
+import utility
+from model import Generator, Discriminator
+
+mpl.use('Agg')
 
 z_dim = 128
 cuda_available = torch.cuda.is_available()
@@ -25,6 +26,7 @@ def build_model():
     optimizer_d = torch.optim.Adam(discriminator.parameters(), lr=2e-4)
 
     return generator, discriminator, loss, optimizer_g, optimizer_d
+
 
 def train(trainloader, generator, discriminator, loss, optimizer_g, optimizer_d):
     ctr = 0
@@ -113,15 +115,13 @@ def train(trainloader, generator, discriminator, loss, optimizer_g, optimizer_d)
 
 
 def main():
-
-    #First (modified) DCGAN, then LSGAN
+    # First (modified) DCGAN, then LSGAN
     generator, discriminator, loss, optimizer_g, optimizer_d = build_model()
     trainloader = utility.trainloader()
     train(trainloader, generator, discriminator, loss, optimizer_g, optimizer_d)
 
     inc_score = inception_score.calculate(utility.trainloader_helper(), cuda=cuda_available, batch_size=32, resize=True, splits=10)
     print('Inception score: {}'.format(inc_score))
-
 
 
 if __name__ == '__main__':

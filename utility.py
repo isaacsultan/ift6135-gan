@@ -1,13 +1,14 @@
-import torch
-import torchvision
-from torchvision import transforms, datasets
 import os
-import matplotlib as mpl
-mpl.use('Agg')
-import matplotlib.pyplot as plt
-from scipy.misc import imresize
-import numpy as np
 import pickle as pk
+
+import matplotlib as mpl
+import matplotlib.pyplot as plt
+import numpy as np
+import torch
+from scipy.misc import imresize
+from torchvision import transforms, datasets
+
+mpl.use('Agg')
 
 
 def trainloader():
@@ -15,8 +16,8 @@ def trainloader():
     train_loader = torch.utils.data.DataLoader(dset, batch_size=128, shuffle=True)
     return train_loader
 
-def trainloader_helper():
 
+def trainloader_helper():
     if not os.path.isdir('data/resized_celebA/'):
         _preprocess_celeb()
 
@@ -52,7 +53,6 @@ def _preprocess_celeb():
 
 
 def save(discriminator, generator):
-
     if not os.path.exists('logs'):
         os.makedirs('logs')
 

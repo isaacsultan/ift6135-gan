@@ -2,8 +2,8 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
-
 cuda_available = torch.cuda.is_available()
+
 
 class Generator(nn.Module):
 
@@ -13,8 +13,8 @@ class Generator(nn.Module):
         self.model_name = 'DCGAN'
 
         self.deconv1 = nn.ConvTranspose2d(
-            in_channels=100, out_channels=z_dim*8,
-            kernel_size=(4, 4), stride =1, padding=0, bias=False
+            in_channels=100, out_channels=z_dim * 8,
+            kernel_size=(4, 4), stride=1, padding=0, bias=False
         )
         self.bn1 = nn.BatchNorm2d(z_dim * 8)
 
@@ -25,13 +25,13 @@ class Generator(nn.Module):
         self.bn2 = nn.BatchNorm2d(z_dim * 4)
 
         self.deconv3 = nn.ConvTranspose2d(
-            in_channels=z_dim * 4, out_channels=z_dim*2,
+            in_channels=z_dim * 4, out_channels=z_dim * 2,
             kernel_size=(4, 4), stride=2, padding=1, bias=False,
         )
-        self.bn3 = nn.BatchNorm2d(z_dim*2)
+        self.bn3 = nn.BatchNorm2d(z_dim * 2)
 
         self.deconv4 = nn.ConvTranspose2d(
-            in_channels=z_dim*2, out_channels=z_dim,
+            in_channels=z_dim * 2, out_channels=z_dim,
             kernel_size=(4, 4), stride=2, padding=1, bias=False,
         )
 
@@ -42,7 +42,7 @@ class Generator(nn.Module):
             kernel_size=(4, 4), stride=2, padding=1, bias=False,
         )
 
-        #Initialise weights to N(0, 0.02)
+        # Initialise weights to N(0, 0.02)
         for m in self._modules:
             if isinstance(m, nn.ConvTranspose2d):
                 m.weight.data.normal_(0.0, 0.02)
@@ -64,7 +64,6 @@ class Discriminator(nn.Module):
         self.z_dim = z_dim
         self.model_name = 'DCGAN'
 
-
         self.conv1 = nn.Conv2d(
             in_channels=3, out_channels=z_dim,
             kernel_size=(4, 4), stride=2, padding=1, bias=False
@@ -84,8 +83,8 @@ class Discriminator(nn.Module):
         self.bn3 = nn.BatchNorm2d(z_dim * 4)
 
         self.conv4 = nn.Conv2d(
-            in_channels=z_dim * 4, out_channels=z_dim*8,
-            kernel_size=(4, 4), stride = 2, padding=1, bias=False,
+            in_channels=z_dim * 4, out_channels=z_dim * 8,
+            kernel_size=(4, 4), stride=2, padding=1, bias=False,
         )
 
         self.bn4 = nn.BatchNorm2d(z_dim * 8)
