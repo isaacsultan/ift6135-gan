@@ -12,10 +12,11 @@ mpl.use('Agg')
 
 z_dim = 128
 cuda_available = torch.cuda.is_available()
-
+if cuda_available:
+    print "Cuda is available!"
 
 def build_model(model_type):
-    generator = Generator(model_name=model_type)
+    generator = Generator(model_name=model_type, z_dim=128)
     discriminator = Discriminator()
     if cuda_available:
         generator = generator.cuda()
@@ -33,7 +34,7 @@ def train(trainloader, generator, discriminator, loss, optimizer_g, optimizer_d)
     minibatch_disc_losses = []
     minibatch_gen_losses = []
 
-    fixed_noise = Variable(torch.FloatTensor(8 * 8, 128, 1, 1).normal_(0, 1), volatile=True)
+    fixed_noise = Variable(torch.FloatTensor(8 * 8, 100, 1, 1).normal_(0, 1), volatile=True)
 
     if cuda_available:
         print("CUDA is available!")
@@ -54,6 +55,7 @@ def train(trainloader, generator, discriminator, loss, optimizer_g, optimizer_d)
                 zeros, ones = zeros.cuda(), ones.cuda()
 
             print("Updating discriminator...")
+
 
             # Sample z ~ N(0, 1)            
             minibatch_noise = Variable(torch.randn((inputs.size(0), 100)).view(-1, 100, 1, 1))
@@ -77,7 +79,7 @@ def train(trainloader, generator, discriminator, loss, optimizer_g, optimizer_d)
             print("Train with fake examples from the generator")
             fake = generator(minibatch_noise).detach()  # Detach to prevent backpropping through the generator
             d_fake = discriminator(fake)
-
+            print inputs.size()
             d_fake_loss = loss(d_fake, zeros)  # Train discriminator to recognize generator samples
             d_fake_loss.backward()
             minibatch_disc_losses.append(d_real_loss.data[0] + d_fake_loss.data[0])
@@ -90,6 +92,7 @@ def train(trainloader, generator, discriminator, loss, optimizer_g, optimizer_d)
             
             print("Sample z ~ N(0, 1)")            
             minibatch_noise = Variable(torch.randn((inputs.size(0), 100)).view(-1, 100, 1, 1))
+
             if cuda_available:
                 minibatch_noise = minibatch_noise.cuda()
 
@@ -109,15 +112,13 @@ def train(trainloader, generator, discriminator, loss, optimizer_g, optimizer_d)
         print('Generator loss : %.3f' % (np.mean(minibatch_gen_losses)))
         print('Discriminator loss : %.3f' % (np.mean(minibatch_disc_losses)))
 
-        utility.plot_result(generator, fixed_noise, 64, epoch, 'logs')
-
+        utility.plot_result(generator, fixed_noise, epoch, 'logs')
     utility.save_losses(minibatch_disc_losses, minibatch_gen_losses, generator.model_name)
     utility.save(discriminator, generator)
 
 
 def main():
-    print("Starting GAN training")
-    for model_type in ['DCGAN', 'LSGAN']:
+    for model_type in ['DCGAN']:
         generator, discriminator, loss, optimizer_g, optimizer_d = build_model(model_type)
         trainloader = utility.trainloader()
         print("Loaded training data")
