@@ -71,7 +71,7 @@ def train(trainloader, generator, discriminator, loss, optimizer_g, optimizer_d)
             else:
                 d_real_loss = 0.5 * torch.mean((d_real - ones) ** 2)
 
-            print("Applying gradients...")
+            print("Applying gradients to discriminator...")
             d_real_loss.backward()
 
             print("Train with fake examples from the generator")
@@ -100,12 +100,11 @@ def train(trainloader, generator, discriminator, loss, optimizer_g, optimizer_d)
                 g_loss = 0.5 * torch.mean((d_fake - ones) ** 2)
             g_loss.backward()
 
-            print("Applying gradients...")
+            print("Applying gradients to generator...")
             optimizer_g.step()
 
             minibatch_gen_losses.append(g_loss.data[0])
-            if ctr % 10 == 0:
-                print("Iteration {} of epoch {}".format(ctr, epoch))
+            print("Iteration {} of epoch {}".format(ctr, epoch))
 
         print('Generator loss : %.3f' % (np.mean(minibatch_gen_losses)))
         print('Discriminator loss : %.3f' % (np.mean(minibatch_disc_losses)))
