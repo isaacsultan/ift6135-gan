@@ -2,13 +2,13 @@ import os
 import pickle as pk
 
 import matplotlib as mpl
+mpl.use('Agg')
 import matplotlib.pyplot as plt
 import numpy as np
 import torch
 from scipy.misc import imresize
 from torchvision import transforms, datasets
 
-mpl.use('Agg')
 
 
 def trainloader():

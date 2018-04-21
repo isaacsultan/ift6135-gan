@@ -54,7 +54,8 @@ class Generator(nn.Module):
         x = F.relu(self.bn2(self.deconv2(x)))
         x = F.relu(self.bn3(self.deconv3(x)))
         x = F.relu(self.bn4(self.deconv4(x)))
-        return F.tanh(self.deconv5(x))
+        x = F.tanh(self.deconv5(x))
+        return x
 
 
 class Discriminator(nn.Module):
@@ -94,6 +95,11 @@ class Discriminator(nn.Module):
             kernel_size=(4, 4), stride=1, padding=0, bias=False,
         )
 
+
+        self.output_layer = nn.Sequential()
+        self.output_layer.add_module('out', self.conv5)
+        self.output_layer.add_module('act', nn.Sigmoid())
+
         # Initialise weights to N(0, 0.02)
         for m in self._modules:
             if isinstance(m, nn.Conv2d):
@@ -106,8 +112,10 @@ class Discriminator(nn.Module):
         x = F.leaky_relu(self.bn2(self.conv2(x)), 0.2)
         x = F.leaky_relu(self.bn3(self.conv3(x)), 0.2)
         x = F.leaky_relu(self.bn4(self.conv4(x)), 0.2)
-
+	
         if self.model_name == 'LSGAN':
-            return self.conv5(x).squeeze()
+            x = self.conv5(x).squeeze()
         else:
-            return F.sigmoid(self.conv5(x)).squeeze()
+            x = self.output_layer(x).squeeze()
+        return x
+        

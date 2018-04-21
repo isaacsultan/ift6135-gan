@@ -55,9 +55,7 @@ def train(trainloader, generator, discriminator, loss, optimizer_g, optimizer_d)
             # UPDATE DISCRIMINATOR
 
             # Sample z ~ N(0, 1)
-            minibatch_noise = Variable(
-                torch.randn((128, 100)).view(-1, 100, 1, 1)
-            )
+            minibatch_noise = Variable(torch.randn((128, 100)).view(-1, 100, 1, 1))
 
             if cuda_available:
                 minibatch_noise = minibatch_noise.cuda()
