@@ -105,6 +105,7 @@ def train(trainloader, generator, discriminator, loss, optimizer_g, optimizer_d)
             optimizer_g.step()
 
             minibatch_gen_losses.append(g_loss.data[0])
+            print("Iteration {}".format(ctr))
 
         print('Generator loss : %.3f' % (np.mean(minibatch_gen_losses)))
         print('Discriminator loss : %.3f' % (np.mean(minibatch_disc_losses)))

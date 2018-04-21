@@ -25,7 +25,7 @@ def trainloader_helper():
         transforms.ToTensor(),
         transforms.Normalize(mean=(0.5, 0.5, 0.5), std=(0.5, 0.5, 0.5))
     ])
-    data_dir = 'data/resized_celebA/celebA'
+    data_dir = 'data/resized_celebA/'
     dset = datasets.ImageFolder(data_dir, transform)
     return dset
 
