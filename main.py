@@ -55,9 +55,8 @@ def train(trainloader, generator, discriminator, loss, optimizer_g, optimizer_d)
 
             print("UPDATE DISCRIMINATOR")
 
-            # Sample z ~ N(0, 1)
-            minibatch_noise = Variable(torch.randn((128, 100)).view(-1, 100, 1, 1))
-
+            # Sample z ~ N(0, 1)            
+            minibatch_noise = Variable(torch.randn((inputs.size(0), 100)).view(-1, 100, 1, 1))
             if cuda_available:
                 minibatch_noise = minibatch_noise.cuda()
 
@@ -89,9 +88,8 @@ def train(trainloader, generator, discriminator, loss, optimizer_g, optimizer_d)
             print("Zero gradients for the generator")
             optimizer_g.zero_grad()
             
-            print("Sample z ~ N(0, 1)")
-            minibatch_noise = Variable(torch.randn((128, 100)).view(-1, 100, 1, 1))
-
+            print("Sample z ~ N(0, 1)")            
+            minibatch_noise = Variable(torch.randn((inputs.size(0), 100)).view(-1, 100, 1, 1))
             if cuda_available:
                 minibatch_noise = minibatch_noise.cuda()
 
