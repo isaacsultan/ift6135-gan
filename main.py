@@ -107,7 +107,6 @@ def train(trainloader, generator, discriminator, loss, optimizer_g, optimizer_d)
             minibatch_gen_losses.append(g_loss.data[0])
             if ctr % 10 == 0:
                 print("Iteration {} of epoch {}".format(ctr, epoch))
-            
 
         print('Generator loss : %.3f' % (np.mean(minibatch_gen_losses)))
         print('Discriminator loss : %.3f' % (np.mean(minibatch_disc_losses)))
