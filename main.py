@@ -36,6 +36,7 @@ def train(trainloader, generator, discriminator, loss, optimizer_g, optimizer_d)
     fixed_noise = Variable(torch.FloatTensor(8 * 8, 128, 1, 1).normal_(0, 1), volatile=True)
 
     if cuda_available:
+        print("CUDA is available!")
         fixed_noise.cuda()
 
     for epoch in range(50):
@@ -52,7 +53,7 @@ def train(trainloader, generator, discriminator, loss, optimizer_g, optimizer_d)
             if cuda_available:
                 zeros, ones = zeros.cuda(), ones.cuda()
 
-            # UPDATE DISCRIMINATOR
+            print("UPDATE DISCRIMINATOR")
 
             # Sample z ~ N(0, 1)
             minibatch_noise = Variable(torch.randn((128, 100)).view(-1, 100, 1, 1))
@@ -72,7 +73,7 @@ def train(trainloader, generator, discriminator, loss, optimizer_g, optimizer_d)
                 d_real_loss = 0.5 * torch.mean((d_real - ones) ** 2)
             d_real_loss.backward()
 
-            # Train with fake examples from the generator
+            print("Train with fake examples from the generator")
             fake = generator(minibatch_noise).detach()  # Detach to prevent backpropping through the generator
             d_fake = discriminator(fake)
 
@@ -85,10 +86,10 @@ def train(trainloader, generator, discriminator, loss, optimizer_g, optimizer_d)
 
             ### UPDATE GENERATOR
 
-            # Zero gradients for the generator
+            print("Zero gradients for the generator")
             optimizer_g.zero_grad()
-
-            # Sample z ~ N(0, 1)
+            
+            print("Sample z ~ N(0, 1)")
             minibatch_noise = Variable(torch.randn((128, 100)).view(-1, 100, 1, 1))
 
             if cuda_available:
@@ -101,7 +102,7 @@ def train(trainloader, generator, discriminator, loss, optimizer_g, optimizer_d)
                 g_loss = 0.5 * torch.mean((d_fake - ones) ** 2)
             g_loss.backward()
 
-            # Update the generator
+            print("Update the generator")
             optimizer_g.step()
 
             minibatch_gen_losses.append(g_loss.data[0])
@@ -118,9 +119,11 @@ def train(trainloader, generator, discriminator, loss, optimizer_g, optimizer_d)
 
 
 def main():
+    print("Starting GAN training")
     for model_type in ['DCGAN', 'LSGAN']:
         generator, discriminator, loss, optimizer_g, optimizer_d = build_model(model_type)
         trainloader = utility.trainloader()
+        print("Loaded training data")
         train(trainloader, generator, discriminator, loss, optimizer_g, optimizer_d)
 
         inc_score = inception_score.calculate(utility.trainloader_helper(), cuda=cuda_available, batch_size=32, resize=True, splits=10)

@@ -10,7 +10,6 @@ from scipy.misc import imresize
 from torchvision import transforms, datasets
 
 
-
 def trainloader():
     dset = trainloader_helper()
     train_loader = torch.utils.data.DataLoader(dset, batch_size=128, shuffle=True)
@@ -18,21 +17,23 @@ def trainloader():
 
 
 def trainloader_helper():
-    if not os.path.isdir('data/resized_celebA/'):
-        _preprocess_celeb()
+    data_dir = '/data/milatmp1/considib/img_align_celebA/celebA/'
+    resized_dir = '/data/milatmp1/considib/resized_celebA/'
+    if not os.path.isdir(resized_dir):
+        _preprocess_celeb(data_dir, resized_dir)
 
     transform = transforms.Compose([
+        #transforms.Resize(64),
         transforms.ToTensor(),
         transforms.Normalize(mean=(0.5, 0.5, 0.5), std=(0.5, 0.5, 0.5))
     ])
-    data_dir = 'data/resized_celebA'
+
+    data_dir = '/data/milatmp1/considib/img_align_celebA'
     dset = datasets.ImageFolder(data_dir, transform)
     return dset
 
 
-def _preprocess_celeb():
-    root = 'data/img_align_celebA/'
-    save_root = 'data/resized_celebA/'
+def _preprocess_celeb(root, save_root):
     resize_size = 64
 
     if not os.path.isdir(save_root):
