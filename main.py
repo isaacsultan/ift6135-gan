@@ -53,7 +53,7 @@ def train(trainloader, generator, discriminator, loss, optimizer_g, optimizer_d)
             if cuda_available:
                 zeros, ones = zeros.cuda(), ones.cuda()
 
-            print("UPDATE DISCRIMINATOR")
+            print("Updating discriminator...")
 
             # Sample z ~ N(0, 1)
             minibatch_noise = Variable(torch.randn((128, 100)).view(-1, 100, 1, 1))
@@ -71,6 +71,8 @@ def train(trainloader, generator, discriminator, loss, optimizer_g, optimizer_d)
                 d_real_loss = loss(d_real, ones)  # Train discriminator to recognize real examples
             else:
                 d_real_loss = 0.5 * torch.mean((d_real - ones) ** 2)
+
+            print("Applying gradients...")
             d_real_loss.backward()
 
             print("Train with fake examples from the generator")
@@ -84,9 +86,7 @@ def train(trainloader, generator, discriminator, loss, optimizer_g, optimizer_d)
             # # the discriminator
             optimizer_d.step()
 
-            ### UPDATE GENERATOR
-
-            print("Zero gradients for the generator")
+            print("Updating the generator...")
             optimizer_g.zero_grad()
             
             print("Sample z ~ N(0, 1)")
@@ -102,7 +102,7 @@ def train(trainloader, generator, discriminator, loss, optimizer_g, optimizer_d)
                 g_loss = 0.5 * torch.mean((d_fake - ones) ** 2)
             g_loss.backward()
 
-            print("Update the generator")
+            print("Applying gradients...")
             optimizer_g.step()
 
             minibatch_gen_losses.append(g_loss.data[0])

@@ -28,8 +28,9 @@ def trainloader_helper():
         transforms.Normalize(mean=(0.5, 0.5, 0.5), std=(0.5, 0.5, 0.5))
     ])
 
-    data_dir = '/data/milatmp1/considib/img_align_celebA'
+    data_dir = '/data/milatmp1/considib/resized_celebA'
     dset = datasets.ImageFolder(data_dir, transform)
+    print("Loaded {} images for training".format(len(dset)))
     return dset
 
 
@@ -43,6 +44,7 @@ def _preprocess_celeb(root, save_root):
     img_list = os.listdir(root)
 
     # ten_percent = len(img_list) // 10
+    print(len(img_list))
 
     for i in range(len(img_list)):
         img = plt.imread(root + img_list[i])
