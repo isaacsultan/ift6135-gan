@@ -117,7 +117,7 @@ def train(trainloader, generator, discriminator, loss, optimizer_g, optimizer_d)
 
 def main():
     print("Starting GAN training")
-    for model_type in ['DCGAN', 'LSGAN']:
+    for model_type in ['LSGAN']:
         generator, discriminator, loss, optimizer_g, optimizer_d = build_model(model_type)
         trainloader = utility.trainloader()
         print("Loaded training data")

@@ -12,13 +12,14 @@ from torchvision import transforms, datasets
 
 def trainloader():
     dset = trainloader_helper()
-    train_loader = torch.utils.data.DataLoader(dset, batch_size=128, shuffle=True)
+    train_loader = torch.utils.data.DataLoader(dset, batch_size=128, shuffle=True,
+num_workers=4)
     return train_loader
 
 
 def trainloader_helper():
-    data_dir = '/data/milatmp1/considib/img_align_celebA/celebA/'
-    resized_dir = '/data/milatmp1/considib/resized_celebA/'
+    data_dir = 'img_align_celebA/celebA/'
+    resized_dir = 'data/resized_celebA/'
     if not os.path.isdir(resized_dir):
         _preprocess_celeb(data_dir, resized_dir)
 
@@ -28,7 +29,7 @@ def trainloader_helper():
         transforms.Normalize(mean=(0.5, 0.5, 0.5), std=(0.5, 0.5, 0.5))
     ])
 
-    data_dir = '/data/milatmp1/considib/resized_celebA'
+    data_dir = 'data/resized_celebA'
     dset = datasets.ImageFolder(data_dir, transform)
     print("Loaded {} images for training".format(len(dset)))
     return dset
