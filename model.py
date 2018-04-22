@@ -60,7 +60,7 @@ class Generator(nn.Module):
 
 class Discriminator(nn.Module):
 
-    def __init__(self, z_dim=128, model_name='DCGAN'):
+    def __init__(self, z_dim=50, model_name='DCGAN'):
         super(Discriminator, self).__init__()
         self.z_dim = z_dim
         self.model_name = model_name

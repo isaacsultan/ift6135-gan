@@ -17,8 +17,8 @@ def trainloader():
 
 
 def trainloader_helper():
-    data_dir = '/data/milatmp1/considib/img_align_celebA/celebA/'
-    resized_dir = '/data/milatmp1/considib/resized_celebA/'
+    data_dir = './data/'
+    resized_dir = './data/resized_celebA'
     if not os.path.isdir(resized_dir):
         _preprocess_celeb(data_dir, resized_dir)
 
@@ -28,7 +28,7 @@ def trainloader_helper():
         transforms.Normalize(mean=(0.5, 0.5, 0.5), std=(0.5, 0.5, 0.5))
     ])
 
-    data_dir = '/data/milatmp1/considib/img_align_celebA'
+    data_dir = './'
     dset = datasets.ImageFolder(data_dir, transform)
     return dset
 
@@ -76,6 +76,7 @@ def save_losses(minibatch_disc_losses, minibatch_gen_losses, model_name):
 
 def plot_result(G, fixed_noise, num_epoch, save_dir, fig_size=(8, 8)):
     G.eval()
+    fixed_noise = fixed_noise.cuda()
     generate_images = G(fixed_noise)
     G.train()
 
@@ -88,10 +89,14 @@ def plot_result(G, fixed_noise, num_epoch, save_dir, fig_size=(8, 8)):
         img = (((img - img.min()) * 255) / (img.max() - img.min())).cpu().data.numpy().transpose(1, 2, 0).astype(
             np.uint8)
         ax.imshow(img, cmap=None, aspect='equal')
+#    import ipdb as pdb
+#    pdb.set_trace()
     plt.subplots_adjust(wspace=0, hspace=0)
     title = 'Epoch {0}'.format(num_epoch)
     fig.text(0.5, 0.04, title, ha='center')
 
-    filename = G.model_name + '_epoch_' + num_epoch + 'png'
+    filename = "{0}_epoch_{1}.png".format(G.model_name, num_epoch)
+    if not os.path.exists(save_dir):
+        os.mkdir(save_dir)    
     plt.savefig(os.path.join(save_dir, filename))
     plt.close()
