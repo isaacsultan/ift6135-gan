@@ -78,6 +78,7 @@ def save_losses(minibatch_disc_losses, minibatch_gen_losses, model_name):
 
 def plot_result(G, fixed_noise, num_epoch, save_dir, fig_size=(8, 8)):
     G.eval()
+    fixed_noise = fixed_noise.cuda()
     generate_images = G(fixed_noise)
     G.train()
 
@@ -94,6 +95,8 @@ def plot_result(G, fixed_noise, num_epoch, save_dir, fig_size=(8, 8)):
     title = 'Epoch {0}'.format(num_epoch)
     fig.text(0.5, 0.04, title, ha='center')
 
-    filename = G.model_name + '_epoch_' + num_epoch + 'png'
+    filename = "{0}_epoch_{1}.png".format(G.model_name, num_epoch)
+    if not os.path.exists(save_dir):
+       os.mkdir(save_dir)
     plt.savefig(os.path.join(save_dir, filename))
     plt.close()
