@@ -52,7 +52,7 @@ def eval_mmd(generator, z_dim):
 
     minibatch_noise = sample_noise(1000, z_dim)
     fake = generator(minibatch_noise)
-    return linear_mmd2(inputs, fake)
+    return linear_mmd2(inputs, fake).data.cpu().numpy()[0]
 
 
 def train(trainloader, generator, discriminator, loss, optimizer_g, optimizer_d):
