@@ -7,38 +7,38 @@ cuda_available = torch.cuda.is_available()
 
 class Generator(nn.Module):
 
-    def __init__(self, z_dim=128, model_name='DCGAN'):
+    def __init__(self, batch_size=128, model_name='DCGAN'):
         super(Generator, self).__init__()
-        self.z_dim = z_dim
+        self.batch_size = batch_size
         self.model_name = model_name
 
         self.deconv1 = nn.ConvTranspose2d(
-            in_channels=100, out_channels=z_dim * 8,
+            in_channels=100, out_channels=batch_size * 8,
             kernel_size=(4, 4), stride=1, padding=0, bias=False
         )
-        self.bn1 = nn.BatchNorm2d(z_dim * 8)
+        self.bn1 = nn.BatchNorm2d(batch_size * 8)
 
         self.deconv2 = nn.ConvTranspose2d(
-            in_channels=z_dim * 8, out_channels=z_dim * 4,
+            in_channels=batch_size * 8, out_channels=batch_size * 4,
             kernel_size=(4, 4), stride=2, padding=1, bias=False,
         )
-        self.bn2 = nn.BatchNorm2d(z_dim * 4)
+        self.bn2 = nn.BatchNorm2d(batch_size * 4)
 
         self.deconv3 = nn.ConvTranspose2d(
-            in_channels=z_dim * 4, out_channels=z_dim * 2,
+            in_channels=batch_size * 4, out_channels=batch_size * 2,
             kernel_size=(4, 4), stride=2, padding=1, bias=False,
         )
-        self.bn3 = nn.BatchNorm2d(z_dim * 2)
+        self.bn3 = nn.BatchNorm2d(batch_size * 2)
 
         self.deconv4 = nn.ConvTranspose2d(
-            in_channels=z_dim * 2, out_channels=z_dim,
+            in_channels=batch_size * 2, out_channels=batch_size,
             kernel_size=(4, 4), stride=2, padding=1, bias=False,
         )
 
-        self.bn4 = nn.BatchNorm2d(z_dim)
+        self.bn4 = nn.BatchNorm2d(batch_size)
 
         self.deconv5 = nn.ConvTranspose2d(
-            in_channels=z_dim, out_channels=3,
+            in_channels=batch_size, out_channels=3,
             kernel_size=(4, 4), stride=2, padding=1, bias=False,
         )
 
@@ -60,38 +60,38 @@ class Generator(nn.Module):
 
 class Discriminator(nn.Module):
 
-    def __init__(self, z_dim=128, model_name='DCGAN'):
+    def __init__(self, batch_size=128, model_name='DCGAN'):
         super(Discriminator, self).__init__()
-        self.z_dim = z_dim
+        self.batch_size = batch_size
         self.model_name = model_name
 
         self.conv1 = nn.Conv2d(
-            in_channels=3, out_channels=z_dim,
+            in_channels=3, out_channels=batch_size,
             kernel_size=(4, 4), stride=2, padding=1, bias=False
         )
-        self.bn1 = nn.BatchNorm2d(z_dim)
+        self.bn1 = nn.BatchNorm2d(batch_size)
 
         self.conv2 = nn.Conv2d(
-            in_channels=z_dim, out_channels=z_dim * 2,
+            in_channels=batch_size, out_channels=batch_size * 2,
             kernel_size=(4, 4), stride=2, padding=1, bias=False,
         )
-        self.bn2 = nn.BatchNorm2d(z_dim * 2)
+        self.bn2 = nn.BatchNorm2d(batch_size * 2)
 
         self.conv3 = nn.Conv2d(
-            in_channels=z_dim * 2, out_channels=z_dim * 4,
+            in_channels=batch_size * 2, out_channels=batch_size * 4,
             kernel_size=(4, 4), stride=2, padding=1, bias=False,
         )
-        self.bn3 = nn.BatchNorm2d(z_dim * 4)
+        self.bn3 = nn.BatchNorm2d(batch_size * 4)
 
         self.conv4 = nn.Conv2d(
-            in_channels=z_dim * 4, out_channels=z_dim * 8,
+            in_channels=batch_size * 4, out_channels=batch_size * 8,
             kernel_size=(4, 4), stride=2, padding=1, bias=False,
         )
 
-        self.bn4 = nn.BatchNorm2d(z_dim * 8)
+        self.bn4 = nn.BatchNorm2d(batch_size * 8)
 
         self.conv5 = nn.Conv2d(
-            in_channels=z_dim * 8, out_channels=1,
+            in_channels=batch_size * 8, out_channels=1,
             kernel_size=(4, 4), stride=1, padding=0, bias=False,
         )
 

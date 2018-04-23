@@ -10,13 +10,14 @@ from model import Generator, Discriminator
 
 mpl.use('Agg')
 
-z_dim = 128
+z_dim = 100
+batch_size = 128
 cuda_available = torch.cuda.is_available()
 if cuda_available:
     print("Cuda is available!")
 
 def build_model(model_type):
-    generator = Generator(model_name=model_type, z_dim=128)
+    generator = Generator(model_name=model_type, batch_size=128)
     discriminator = Discriminator()
     if cuda_available:
         generator = generator.cuda()
@@ -29,12 +30,20 @@ def build_model(model_type):
     return generator, discriminator, loss, optimizer_g, optimizer_d
 
 
+def sample_noise(batch_size, z_dim):
+    # Sample z ~ N(0, 1)            
+    minibatch_noise = Variable(torch.randn((batch_size, z_dim)).view(-1, z_dim, 1, 1))
+    if cuda_available:
+        minibatch_noise = minibatch_noise.cuda()
+    return minibatch_noise
+
+
 def train(trainloader, generator, discriminator, loss, optimizer_g, optimizer_d):
     ctr = 0
     minibatch_disc_losses = []
     minibatch_gen_losses = []
 
-    fixed_noise = Variable(torch.FloatTensor(8 * 8, 100, 1, 1).normal_(0, 1), volatile=True)
+    fixed_noise = Variable(torch.FloatTensor(8 * 8, z_dim, 1, 1).normal_(0, 1), volatile=True)
 
     if cuda_available:
         print("CUDA is available!")
@@ -48,19 +57,14 @@ def train(trainloader, generator, discriminator, loss, optimizer_g, optimizer_d)
 
             inputs, targets = Variable(inputs), Variable(targets)
 
-            zeros = Variable(torch.zeros(inputs.size(0)))
-            ones = Variable(torch.ones(inputs.size(0)))
+            zeros = Variable(torch.zeros(batch_size))
+            ones = Variable(torch.ones(batch_size))
 
             if cuda_available:
                 zeros, ones = zeros.cuda(), ones.cuda()
 
             #print("Updating discriminator...")
-
-
-            # Sample z ~ N(0, 1)            
-            minibatch_noise = Variable(torch.randn((inputs.size(0), 100)).view(-1, 100, 1, 1))
-            if cuda_available:
-                minibatch_noise = minibatch_noise.cuda()
+            minibatch_noise = sample_noise(batch_size, z_dim)
 
             # Zero gradients for the discriminator
             optimizer_d.zero_grad()
@@ -91,10 +95,7 @@ def train(trainloader, generator, discriminator, loss, optimizer_g, optimizer_d)
             optimizer_g.zero_grad()
             
             #print("Sample z ~ N(0, 1)")            
-            minibatch_noise = Variable(torch.randn((inputs.size(0), 100)).view(-1, 100, 1, 1))
-
-            if cuda_available:
-                minibatch_noise = minibatch_noise.cuda()
+            minibatch_noise = sample_noise(batch_size, z_dim)
 
             d_fake = discriminator(generator(minibatch_noise))
             if generator.model_name == 'DCGAN':
@@ -109,9 +110,15 @@ def train(trainloader, generator, discriminator, loss, optimizer_g, optimizer_d)
             minibatch_gen_losses.append(g_loss.data[0])
             if ctr%10==0:
                 print("Iteration {} of epoch {}".format(ctr, epoch))
+            break
 
         print('Generator loss : %.3f' % (np.mean(minibatch_gen_losses)))
         print('Discriminator loss : %.3f' % (np.mean(minibatch_disc_losses)))
+
+        minibatch_noise = sample_noise(1000, z_dim)
+        inc_score = inception_score.evaluate(generator, cuda=cuda_available)
+        print('Inception score: {}'.format(inc_score))
+        print("{},{}".format(epoch, inc_score), file=open("eval.log", "a"))
 
         utility.plot_result(generator, fixed_noise, epoch)
         loss_name = "{0}_epoch{1}".format(generator.model_name, epoch)
@@ -122,11 +129,11 @@ def train(trainloader, generator, discriminator, loss, optimizer_g, optimizer_d)
 def main():
     for model_type in ['DCGAN']:
         generator, discriminator, loss, optimizer_g, optimizer_d = build_model(model_type)
-        trainloader = utility.trainloader()
+        trainloader = utility.trainloader(batch_size)
         print("Loaded training data")
         train(trainloader, generator, discriminator, loss, optimizer_g, optimizer_d)
 
-        #inc_score = inception_score.calculate(utility.trainloader_helper(), cuda=cuda_available, batch_size=32, resize=True, splits=10)
+        #inc_score = inception_score.calculate(utility.trainloader_helper(batch_size), cuda=cuda_available, batch_size=32, resize=True, splits=10)
         #print('Inception score: {}'.format(inc_score))
 
 

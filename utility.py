@@ -7,15 +7,16 @@ mpl.use('Agg')
 import matplotlib.pyplot as plt
 import numpy as np
 import torch
+from torch.autograd import Variable
 from scipy.misc import imresize
 from torchvision import transforms, datasets
 
 log_dir = 'logs'
 
 
-def trainloader():
+def trainloader(batch_size):
     dset = trainloader_helper()
-    train_loader = torch.utils.data.DataLoader(dset, batch_size=128, shuffle=True, num_workers=6)
+    train_loader = torch.utils.data.DataLoader(dset, batch_size=batch_size, shuffle=True, num_workers=6)
     return train_loader
 
 
