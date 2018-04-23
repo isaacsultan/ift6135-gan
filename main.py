@@ -76,14 +76,14 @@ def train(trainloader, generator, discriminator, loss, optimizer_g, optimizer_d)
 
             inputs, targets = Variable(inputs), Variable(targets)
 
-            zeros = Variable(torch.zeros(batch_size))
-            ones = Variable(torch.ones(batch_size))
+            zeros = Variable(torch.zeros(inputs.size(0)))
+            ones = Variable(torch.ones(inputs.size(0)))
 
             if cuda_available:
                 zeros, ones = zeros.cuda(), ones.cuda()
 
             # print("Updating discriminator...")
-            minibatch_noise = sample_noise(batch_size, z_dim)
+            minibatch_noise = sample_noise(inputs.size(0), z_dim)
 
             # Zero gradients for the discriminator
             optimizer_d.zero_grad()
@@ -115,7 +115,7 @@ def train(trainloader, generator, discriminator, loss, optimizer_g, optimizer_d)
             optimizer_g.zero_grad()
 
             # print("Sample z ~ N(0, 1)")
-            minibatch_noise = sample_noise(batch_size, z_dim)
+            minibatch_noise = sample_noise(inputs.size(0), z_dim)
 
             d_fake = discriminator(generator(minibatch_noise))
             if generator.model_name == 'DCGAN':
