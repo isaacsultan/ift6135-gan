@@ -130,7 +130,6 @@ def train(trainloader, generator, discriminator, loss, optimizer_g, optimizer_d)
             minibatch_gen_losses.append(g_loss.data[0])
             if ctr % 10 == 0:
                 print("Iteration {} of epoch {}".format(ctr, epoch))
-            break
 
         print('Generator loss : %.3f' % (np.mean(minibatch_gen_losses)))
         print('Discriminator loss : %.3f' % (np.mean(minibatch_disc_losses)))
@@ -139,7 +138,7 @@ def train(trainloader, generator, discriminator, loss, optimizer_g, optimizer_d)
         mmd_score = eval_mmd(generator, z_dim)
         print('MMD score      : {}'.format(mmd_score))
         print('Inception score: {}'.format(inc_score))
-        print("{},{},{}".format(epoch, inc_score, mmd_score), file=open("logs/eval.log", "a"))
+        print("{}, {}, {}".format(epoch, inc_score, mmd_score), file=open("logs/eval.log", "a"))
 
         utility.plot_result(generator, fixed_noise, epoch)
         loss_name = "{0}_epoch{1}".format(generator.model_name, epoch)
