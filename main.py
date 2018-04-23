@@ -13,7 +13,7 @@ mpl.use('Agg')
 z_dim = 128
 cuda_available = torch.cuda.is_available()
 if cuda_available:
-    print "Cuda is available!"
+    print("Cuda is available!")
 
 def build_model(model_type):
     generator = Generator(model_name=model_type, z_dim=128)
@@ -79,7 +79,7 @@ def train(trainloader, generator, discriminator, loss, optimizer_g, optimizer_d)
             print("Train with fake examples from the generator")
             fake = generator(minibatch_noise).detach()  # Detach to prevent backpropping through the generator
             d_fake = discriminator(fake)
-            print inputs.size()
+
             d_fake_loss = loss(d_fake, zeros)  # Train discriminator to recognize generator samples
             d_fake_loss.backward()
             minibatch_disc_losses.append(d_real_loss.data[0] + d_fake_loss.data[0])
