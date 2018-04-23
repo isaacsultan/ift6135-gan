@@ -2,6 +2,7 @@ import os
 import pickle as pk
 
 import matplotlib as mpl
+
 mpl.use('Agg')
 import matplotlib.pyplot as plt
 import numpy as np
@@ -23,7 +24,7 @@ def trainloader_helper():
         _preprocess_celeb(data_dir, resized_dir)
 
     transform = transforms.Compose([
-        #transforms.Resize(64),
+        # transforms.Resize(64),
         transforms.ToTensor(),
         transforms.Normalize(mean=(0.5, 0.5, 0.5), std=(0.5, 0.5, 0.5))
     ])
@@ -55,12 +56,13 @@ def _preprocess_celeb(root, save_root):
             print('%d images complete' % i)
 
 
-def save(discriminator, generator):
+def save(discriminator, generator, epoch):
     if not os.path.exists('logs'):
         os.makedirs('logs')
-
-    torch.save(generator.state_dict(), os.path.join('logs', generator.model_name + '_G.pkl'))
-    torch.save(discriminator.state_dict(), os.path.join('logs', discriminator.model_name + '_D.pkl'))
+    gen_filename = generator.model_name + '_' + epoch + '_G.pkl'
+    dis_filename = discriminator.model_name + '_' + epoch + '_D.pkl'
+    torch.save(generator.state_dict(), os.path.join('logs', gen_filename))
+    torch.save(discriminator.state_dict(), os.path.join('logs', dis_filename))
 
 
 def save_losses(minibatch_disc_losses, minibatch_gen_losses, model_name):

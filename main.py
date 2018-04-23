@@ -87,8 +87,8 @@ def train(trainloader, generator, discriminator, loss, optimizer_g, optimizer_d)
 
             print("Updating the generator...")
             optimizer_g.zero_grad()
-            
-            print("Sample z ~ N(0, 1)")            
+
+            print("Sample z ~ N(0, 1)")
             minibatch_noise = Variable(torch.randn((inputs.size(0), 100)).view(-1, 100, 1, 1))
             if cuda_available:
                 minibatch_noise = minibatch_noise.cuda()
@@ -110,9 +110,9 @@ def train(trainloader, generator, discriminator, loss, optimizer_g, optimizer_d)
         print('Discriminator loss : %.3f' % (np.mean(minibatch_disc_losses)))
 
         utility.plot_result(generator, fixed_noise, 64, epoch, 'logs')
+        utility.save(discriminator, generator, epoch)
 
     utility.save_losses(minibatch_disc_losses, minibatch_gen_losses, generator.model_name)
-    utility.save(discriminator, generator)
 
 
 def main():
@@ -123,7 +123,8 @@ def main():
         print("Loaded training data")
         train(trainloader, generator, discriminator, loss, optimizer_g, optimizer_d)
 
-        inc_score = inception_score.calculate(utility.trainloader_helper(), cuda=cuda_available, batch_size=32, resize=True, splits=10)
+        inc_score = inception_score.calculate(utility.trainloader_helper(), cuda=cuda_available, batch_size=32,
+                                              resize=True, splits=10)
         print('Inception score: {}'.format(inc_score))
 
 
