@@ -10,6 +10,8 @@ import torch
 from scipy.misc import imresize
 from torchvision import transforms, datasets
 
+log_dir = 'logs'
+
 
 def trainloader():
     dset = trainloader_helper()
@@ -57,28 +59,28 @@ def _preprocess_celeb(root, save_root):
 
 
 def save(discriminator, generator, epoch=0):
-    if not os.path.exists('logs'):
-        os.makedirs('logs')
+    if not os.path.exists(log_dir):
+        os.makedirs(log_dir)
     gen_model_name   = "{0}_{1}_G.pkl".format(generator.model_name, epoch)
     disc_model_name  = "{0}_{1}_D.pkl".format(discriminator.model_name, epoch)
-    torch.save(generator.state_dict(), os.path.join('logs', gen_model_name))
-    torch.save(discriminator.state_dict(), os.path.join('logs', disc_model_name))
+    torch.save(generator.state_dict(), os.path.join(log_dir, gen_model_name))
+    torch.save(discriminator.state_dict(), os.path.join(log_dir, disc_model_name))
 
 
 def save_losses(minibatch_disc_losses, minibatch_gen_losses, model_name):
-    if not os.path.exists('logs'):
-        os.makedirs('logs')
+    if not os.path.exists(log_dir):
+        os.makedirs(log_dir)
 
     fname1 = model_name + '_minibatch_disc_losses.pk'
     fname2 = model_name + '_minibatch_gen_losses.pk'
 
-    with open(os.path.join('logs', fname1), "wb") as f:
+    with open(os.path.join(log_dir, fname1), "wb") as f:
         pk.dump(minibatch_disc_losses, f)
-    with open(os.path.join('logs', fname2), "wb") as f:
+    with open(os.path.join(log_dir, fname2), "wb") as f:
         pk.dump(minibatch_gen_losses, f)
 
 
-def plot_result(G, fixed_noise, num_epoch, save_dir, fig_size=(8, 8)):
+def plot_result(G, fixed_noise, num_epoch, fig_size=(8, 8)):
     G.eval()
     fixed_noise = fixed_noise.cuda()
     generate_images = G(fixed_noise)
@@ -98,7 +100,7 @@ def plot_result(G, fixed_noise, num_epoch, save_dir, fig_size=(8, 8)):
     fig.text(0.5, 0.04, title, ha='center')
 
     filename = "{0}_epoch_{1}.png".format(G.model_name, num_epoch)
-    if not os.path.exists(save_dir):
-       os.mkdir(save_dir)
-    plt.savefig(os.path.join(save_dir, filename))
+    if not os.path.exists(log_dir):
+       os.mkdir(log_dir)
+    plt.savefig(os.path.join(log_dir, filename))
     plt.close()

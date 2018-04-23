@@ -113,7 +113,7 @@ def train(trainloader, generator, discriminator, loss, optimizer_g, optimizer_d)
         print('Generator loss : %.3f' % (np.mean(minibatch_gen_losses)))
         print('Discriminator loss : %.3f' % (np.mean(minibatch_disc_losses)))
 
-        utility.plot_result(generator, fixed_noise, epoch, 'logs')
+        utility.plot_result(generator, fixed_noise, epoch)
         loss_name = "{0}_epoch{1}".format(generator.model_name, epoch)
         utility.save_losses(minibatch_disc_losses, minibatch_gen_losses, loss_name)
         utility.save(discriminator, generator, epoch)
