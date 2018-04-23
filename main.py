@@ -40,8 +40,11 @@ def sample_noise(batch_size, z_dim):
     return minibatch_noise
 
 
+eval_loader = iter(utility.trainloader(1000))
+
+
 def eval_mmd(generator, z_dim):
-    inputs, targets = next(iter(utility.trainloader(1000)))
+    inputs, targets = next(eval_loader)
     if cuda_available:
         inputs, targets = inputs.cuda(), targets.cuda()
 
@@ -134,7 +137,7 @@ def train(trainloader, generator, discriminator, loss, optimizer_g, optimizer_d)
 
         inc_score = inception_score.evaluate(generator, z_dim, cuda=cuda_available)
         mmd_score = eval_mmd(generator, z_dim)
-        print('MMD score      : {}'.format(inc_score))
+        print('MMD score      : {}'.format(mmd_score))
         print('Inception score: {}'.format(inc_score))
         print("{},{},{}".format(epoch, inc_score, mmd_score), file=open("logs/eval.log", "a"))
 

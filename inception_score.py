@@ -83,4 +83,4 @@ def evaluate(model, z_dim, N=1000, cuda=True, batch_size=32, resize=True, splits
             scores.append(entropy(pyx, py))
         split_scores.append(np.exp(np.mean(scores)))
 
-    return np.mean(split_scores), np.std(split_scores)
+    return np.mean(split_scores) #, np.std(split_scores)
