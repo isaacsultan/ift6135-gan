@@ -13,7 +13,7 @@ from torchvision import transforms, datasets
 
 def trainloader():
     dset = trainloader_helper()
-    train_loader = torch.utils.data.DataLoader(dset, batch_size=128, shuffle=True)
+    train_loader = torch.utils.data.DataLoader(dset, batch_size=128, shuffle=True, num_workers=6)
     return train_loader
 
 
@@ -56,13 +56,13 @@ def _preprocess_celeb(root, save_root):
             print('%d images complete' % i)
 
 
-def save(discriminator, generator, epoch):
+def save(discriminator, generator, epoch=0):
     if not os.path.exists('logs'):
         os.makedirs('logs')
-    gen_filename = generator.model_name + '_' + epoch + '_G.pkl'
-    dis_filename = discriminator.model_name + '_' + epoch + '_D.pkl'
-    torch.save(generator.state_dict(), os.path.join('logs', gen_filename))
-    torch.save(discriminator.state_dict(), os.path.join('logs', dis_filename))
+    gen_model_name   = "{0}_{1}_G.pkl".format(generator.model_name, epoch)
+    disc_model_name  = "{0}_{1}_D.pkl".format(discriminator.model_name, epoch)
+    torch.save(generator.state_dict(), os.path.join('logs', gen_model_name))
+    torch.save(discriminator.state_dict(), os.path.join('logs', disc_model_name))
 
 
 def save_losses(minibatch_disc_losses, minibatch_gen_losses, model_name):
@@ -72,9 +72,9 @@ def save_losses(minibatch_disc_losses, minibatch_gen_losses, model_name):
     fname1 = model_name + '_minibatch_disc_losses.pk'
     fname2 = model_name + '_minibatch_gen_losses.pk'
 
-    with open(os.path.join('logs', fname1)) as f:
+    with open(os.path.join('logs', fname1), "wb") as f:
         pk.dump(minibatch_disc_losses, f)
-    with open(os.path.join('logs', fname2)) as f:
+    with open(os.path.join('logs', fname2), "wb") as f:
         pk.dump(minibatch_gen_losses, f)
 
 
