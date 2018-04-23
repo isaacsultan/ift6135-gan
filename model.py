@@ -95,7 +95,6 @@ class Discriminator(nn.Module):
             kernel_size=(4, 4), stride=1, padding=0, bias=False,
         )
 
-
         self.output_layer = nn.Sequential()
         self.output_layer.add_module('out', self.conv5)
         self.output_layer.add_module('act', nn.Sigmoid())
@@ -112,10 +111,9 @@ class Discriminator(nn.Module):
         x = F.leaky_relu(self.bn2(self.conv2(x)), 0.2)
         x = F.leaky_relu(self.bn3(self.conv3(x)), 0.2)
         x = F.leaky_relu(self.bn4(self.conv4(x)), 0.2)
-	
+
         if self.model_name == 'LSGAN':
             x = self.conv5(x).squeeze()
         else:
             x = self.output_layer(x).squeeze()
         return x
-        

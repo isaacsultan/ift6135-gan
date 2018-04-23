@@ -7,7 +7,6 @@ mpl.use('Agg')
 import matplotlib.pyplot as plt
 import numpy as np
 import torch
-from torch.autograd import Variable
 from scipy.misc import imresize
 from torchvision import transforms, datasets
 
@@ -62,8 +61,8 @@ def _preprocess_celeb(root, save_root):
 def save(discriminator, generator, epoch=0):
     if not os.path.exists(log_dir):
         os.makedirs(log_dir)
-    gen_model_name   = "{0}_{1}_G.pkl".format(generator.model_name, epoch)
-    disc_model_name  = "{0}_{1}_D.pkl".format(discriminator.model_name, epoch)
+    gen_model_name = "{0}_{1}_G.pkl".format(generator.model_name, epoch)
+    disc_model_name = "{0}_{1}_D.pkl".format(discriminator.model_name, epoch)
     torch.save(generator.state_dict(), os.path.join(log_dir, gen_model_name))
     torch.save(discriminator.state_dict(), os.path.join(log_dir, disc_model_name))
 
@@ -102,6 +101,6 @@ def plot_result(G, fixed_noise, num_epoch, fig_size=(8, 8)):
 
     filename = "{0}_epoch_{1}.png".format(G.model_name, num_epoch)
     if not os.path.exists(log_dir):
-       os.mkdir(log_dir)
+        os.mkdir(log_dir)
     plt.savefig(os.path.join(log_dir, filename))
     plt.close()

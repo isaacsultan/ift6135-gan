@@ -16,6 +16,7 @@ cuda_available = torch.cuda.is_available()
 if cuda_available:
     print("Cuda is available!")
 
+
 def build_model(model_type):
     generator = Generator(model_name=model_type, batch_size=128)
     discriminator = Discriminator()
@@ -63,7 +64,7 @@ def train(trainloader, generator, discriminator, loss, optimizer_g, optimizer_d)
             if cuda_available:
                 zeros, ones = zeros.cuda(), ones.cuda()
 
-            #print("Updating discriminator...")
+            # print("Updating discriminator...")
             minibatch_noise = sample_noise(batch_size, z_dim)
 
             # Zero gradients for the discriminator
@@ -77,10 +78,10 @@ def train(trainloader, generator, discriminator, loss, optimizer_g, optimizer_d)
             else:
                 d_real_loss = 0.5 * torch.mean((d_real - ones) ** 2)
 
-            #print("Applying gradients to discriminator...")
+            # print("Applying gradients to discriminator...")
             d_real_loss.backward()
 
-            #print("Train with fake examples from the generator")
+            # print("Train with fake examples from the generator")
             fake = generator(minibatch_noise).detach()  # Detach to prevent backpropping through the generator
             d_fake = discriminator(fake)
 
@@ -91,10 +92,10 @@ def train(trainloader, generator, discriminator, loss, optimizer_g, optimizer_d)
             # # the discriminator
             optimizer_d.step()
 
-            #print("Updating the generator...")
+            # print("Updating the generator...")
             optimizer_g.zero_grad()
-            
-            #print("Sample z ~ N(0, 1)")            
+
+            # print("Sample z ~ N(0, 1)")
             minibatch_noise = sample_noise(batch_size, z_dim)
 
             d_fake = discriminator(generator(minibatch_noise))
@@ -104,18 +105,17 @@ def train(trainloader, generator, discriminator, loss, optimizer_g, optimizer_d)
                 g_loss = 0.5 * torch.mean((d_fake - ones) ** 2)
             g_loss.backward()
 
-            #print("Applying gradients to generator...")
+            # print("Applying gradients to generator...")
             optimizer_g.step()
 
             minibatch_gen_losses.append(g_loss.data[0])
-            if ctr%10==0:
+            if ctr % 10 == 0:
                 print("Iteration {} of epoch {}".format(ctr, epoch))
 
         print('Generator loss : %.3f' % (np.mean(minibatch_gen_losses)))
         print('Discriminator loss : %.3f' % (np.mean(minibatch_disc_losses)))
 
-        minibatch_noise = sample_noise(1000, z_dim)
-        inc_score = inception_score.evaluate(generator, cuda=cuda_available)
+        inc_score = inception_score.evaluate(generator, z_dim, cuda=cuda_available)
         print('Inception score: {}'.format(inc_score))
         print("{},{}".format(epoch, inc_score), file=open("eval.log", "a"))
 
@@ -132,8 +132,8 @@ def main():
         print("Loaded training data")
         train(trainloader, generator, discriminator, loss, optimizer_g, optimizer_d)
 
-        #inc_score = inception_score.calculate(utility.trainloader_helper(batch_size), cuda=cuda_available, batch_size=32, resize=True, splits=10)
-        #print('Inception score: {}'.format(inc_score))
+        # inc_score = inception_score.calculate(utility.trainloader_helper(batch_size), cuda=cuda_available, batch_size=32, resize=True, splits=10)
+        # print('Inception score: {}'.format(inc_score))
 
 
 if __name__ == '__main__':
