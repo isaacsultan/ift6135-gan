@@ -6,6 +6,7 @@ from torch.autograd import Variable
 
 import inception_score
 import utility
+from mmd_score import linear_mmd2
 from model import Generator, Discriminator
 
 mpl.use('Agg')
@@ -39,6 +40,18 @@ def sample_noise(batch_size, z_dim):
     return minibatch_noise
 
 
+def eval_mmd(generator, z_dim):
+    inputs, targets = utility.trainloader(1000).next()
+    if cuda_available:
+        inputs, targets = inputs.cuda(), targets.cuda()
+
+    inputs, targets = Variable(inputs), Variable(targets)
+
+    minibatch_noise = sample_noise(1000, z_dim)
+    fake = generator(minibatch_noise)
+    return linear_mmd2(inputs, fake)
+
+
 def train(trainloader, generator, discriminator, loss, optimizer_g, optimizer_d):
     ctr = 0
     minibatch_disc_losses = []
@@ -49,6 +62,8 @@ def train(trainloader, generator, discriminator, loss, optimizer_g, optimizer_d)
     if cuda_available:
         print("CUDA is available!")
         fixed_noise.cuda()
+
+    print("Epoch, Inception Score, MMD Score", file=open("eval.log", "a"))
 
     for epoch in range(50):
         for batch_idx, (inputs, targets) in enumerate(trainloader):
@@ -83,6 +98,7 @@ def train(trainloader, generator, discriminator, loss, optimizer_g, optimizer_d)
 
             # print("Train with fake examples from the generator")
             fake = generator(minibatch_noise).detach()  # Detach to prevent backpropping through the generator
+
             d_fake = discriminator(fake)
 
             d_fake_loss = loss(d_fake, zeros)  # Train discriminator to recognize generator samples
@@ -111,13 +127,16 @@ def train(trainloader, generator, discriminator, loss, optimizer_g, optimizer_d)
             minibatch_gen_losses.append(g_loss.data[0])
             if ctr % 10 == 0:
                 print("Iteration {} of epoch {}".format(ctr, epoch))
+            break
 
         print('Generator loss : %.3f' % (np.mean(minibatch_gen_losses)))
         print('Discriminator loss : %.3f' % (np.mean(minibatch_disc_losses)))
 
         inc_score = inception_score.evaluate(generator, z_dim, cuda=cuda_available)
+        mmd_score = eval_mmd(generator, z_dim)
+        print('MMD score      : {}'.format(inc_score))
         print('Inception score: {}'.format(inc_score))
-        print("{},{}".format(epoch, inc_score), file=open("eval.log", "a"))
+        print("{},{},{}".format(epoch, inc_score, mmd_score), file=open("eval.log", "a"))
 
         utility.plot_result(generator, fixed_noise, epoch)
         loss_name = "{0}_epoch{1}".format(generator.model_name, epoch)

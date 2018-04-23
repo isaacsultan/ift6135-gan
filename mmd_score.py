@@ -4,8 +4,9 @@
 
 import torch
 
-min_var_est = 1e-8
+import utility
 
+min_var_est = 1e-8
 
 # Consider linear time MMD with a linear kernel:
 # K(f(x), f(y)) = f(x)^Tf(y)
