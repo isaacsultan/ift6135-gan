@@ -41,7 +41,7 @@ def sample_noise(batch_size, z_dim):
 
 
 def eval_mmd(generator, z_dim):
-    inputs, targets = utility.trainloader(1000).next()
+    inputs, targets = next(iter(utility.trainloader(1000)))
     if cuda_available:
         inputs, targets = inputs.cuda(), targets.cuda()
 
@@ -63,7 +63,7 @@ def train(trainloader, generator, discriminator, loss, optimizer_g, optimizer_d)
         print("CUDA is available!")
         fixed_noise.cuda()
 
-    print("Epoch, Inception Score, MMD Score", file=open("eval.log", "a"))
+    print("Epoch, Inception Score, MMD Score", file=open("logs/eval.log", "a"))
 
     for epoch in range(50):
         for batch_idx, (inputs, targets) in enumerate(trainloader):
@@ -136,7 +136,7 @@ def train(trainloader, generator, discriminator, loss, optimizer_g, optimizer_d)
         mmd_score = eval_mmd(generator, z_dim)
         print('MMD score      : {}'.format(inc_score))
         print('Inception score: {}'.format(inc_score))
-        print("{},{},{}".format(epoch, inc_score, mmd_score), file=open("eval.log", "a"))
+        print("{},{},{}".format(epoch, inc_score, mmd_score), file=open("logs/eval.log", "a"))
 
         utility.plot_result(generator, fixed_noise, epoch)
         loss_name = "{0}_epoch{1}".format(generator.model_name, epoch)
