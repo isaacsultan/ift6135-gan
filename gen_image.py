@@ -43,15 +43,9 @@ def gen_image(G, num_epoch, save_dir, fig_size=(8, 8), interpolate=False, incept
         np.save('samples_for_score', generate_images.data.cpu().numpy())
         print("images saved for inception score calculations")
         os._exit(0)
-    new_images = torch.ones(64,3,64,64)
-    x0 = generate_images[0]
-    x1 = generate_images[1]
-    alphas = torch.linspace(0, 10, 64)
-    for i in range(64): 
-        new_images[i] = alphas[i]*x0.data + (1-alphas[i])*x1.data   
     n_rows = n_cols = 8
     fig, axes = plt.subplots(n_rows, n_cols, figsize=fig_size)
-    for ax, img in zip(axes.flatten(), new_images):
+    for ax, img in zip(axes.flatten(), generate_images):
         ax.axis('off')
         ax.set_adjustable('box-forced')
         img = (((img - img.min()) * 255) / (img.max() - img.min())).numpy().transpose(1, 2, 0).astype(
