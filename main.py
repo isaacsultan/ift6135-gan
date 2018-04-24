@@ -66,7 +66,7 @@ def train(trainloader, generator, discriminator, loss, optimizer_g, optimizer_d)
         print("CUDA is available!")
         fixed_noise.cuda()
 
-    print("Epoch, Inception Score, MMD Score", file=open("logs/eval.log", "a"))
+    print("Epoch, Inception Score, MMD Score", file=open("logs/eval.csv", "a"))
 
     for epoch in range(50):
         for batch_idx, (inputs, targets) in enumerate(trainloader):
