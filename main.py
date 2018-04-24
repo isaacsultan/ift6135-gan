@@ -138,7 +138,7 @@ def train(trainloader, generator, discriminator, loss, optimizer_g, optimizer_d)
         mmd_score = eval_mmd(generator, z_dim)
         print('MMD score      : {}'.format(mmd_score))
         print('Inception score: {}'.format(inc_score))
-        print("{}, {}, {}".format(epoch, inc_score, mmd_score), file=open("logs/eval.log", "a"))
+        print("{}, {}, {}".format(epoch, inc_score, mmd_score), file=open("logs/eval.csv", "a"))
 
         utility.plot_result(generator, fixed_noise, epoch)
         loss_name = "{0}_epoch{1}".format(generator.model_name, epoch)
